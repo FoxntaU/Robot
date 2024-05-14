@@ -99,13 +99,35 @@ class RobotFactory implements  Directions {
     }
 }
 
-// this class create the beepers in the map
-// public class BeepersFactory {
+//this class create the beepers in the map
+class BeepersFactory{
 
-// }
+    public static void generateBeepersRandomly(String[] args)
+    {
+        int min_avenue = 3;
+        int min_street = 1;
+        int range_street =  8 - min_street +1;
+        int range_aveneu =  10 - min_avenue +1;
+
+        int num_beepers = 10; //usar args para encontrar la cantidad de beepers
+        for (int i = 0; i <num_beepers; i++)
+        {
+            
+            int street = (int)(Math.random()*range_street + min_street);
+            int avenue = (int)(Math.random()*range_aveneu + min_avenue);
+            System.out.println(street);
+            System.out.println("beeper added in stree: "+street+", avenue"+avenue);
+            World.placeBeepers(street, avenue, 1 );
+            
+        }
+        World.saveWorld("Mundo1.kwld");
+    }
+
+}
 
 public class MiPrimerRobot {
     public static void main(String[] args) {
+        BeepersFactory.generateBeepersRandomly(args);
         World.readWorld("Mundo.kwld");
         World.setVisible(true);
 
