@@ -5,9 +5,12 @@ import java.util.List;
 
 class Racer extends Robot {
     private int maxBeepers;
+    //private int[] deliveryPosition;
     public Racer(int street, int avenue, Direction direction, int beepers, Color color, int maxBeepers) {
         super(street, avenue, direction, beepers, color);
         this.maxBeepers = maxBeepers;
+        //this.deliveryPosition[0] = street;
+        //this.deliveryPosition[1] = maxBeepers; //aveneu para entregar los beeper
         World.setupThread(this);
     }
 
@@ -108,23 +111,35 @@ class BeepersFactory{
         int min_street = 1;
         int range_street =  8 - min_street +1;
         int range_aveneu =  10 - min_avenue +1;
+        int r = 1;
 
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-r") && i + 1 < args.length) {
+                try {
+                    r = Integer.parseInt(args[i + 1]);
+                    if (r != 1 && r != 2 && r != 4) {
+                        System.out.println("El valor de -r debe ser 1, 2, o 4");
+                        return;
+                    }
+                    i++; // Saltar al siguiente argumento
+                } catch (NumberFormatException ex) {
+                    System.out.println("El valor de -r debe ser un número");
+                    return;
+                }
+            }
         int num_beepers = 10; //usar args para encontrar la cantidad de beepers
-        for (int i = 0; i <num_beepers; i++)
+        for (int j = 0; j <r*100; j++)
         {
             
             int street = (int)(Math.random()*range_street + min_street);
             int avenue = (int)(Math.random()*range_aveneu + min_avenue);
-            System.out.println(street);
-            System.out.println("beeper added in stree: "+street+", avenue"+avenue);
             World.placeBeepers(street, avenue, 1 );
             
         }
-        World.saveWorld("Mundo1.kwld");
     }
 
 }
-
+}
 public class MiPrimerRobot {
     public static void main(String[] args) {
         BeepersFactory.generateBeepersRandomly(args);
