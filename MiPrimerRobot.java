@@ -5,12 +5,13 @@ import java.util.List;
 
 class Racer extends Robot {
     private int maxBeepers;
-    //private int[] deliveryPosition;
+    private int deliveryPosition[];
     public Racer(int street, int avenue, Direction direction, int beepers, Color color, int maxBeepers) {
         super(street, avenue, direction, beepers, color);
         this.maxBeepers = maxBeepers;
-        //this.deliveryPosition[0] = street;
-        //this.deliveryPosition[1] = maxBeepers; //aveneu para entregar los beeper
+        this.deliveryPosition = new int[2];
+        this.deliveryPosition[0] = street;
+        this.deliveryPosition[1] = maxBeepers; //aveneu para entregar los beeper
         World.setupThread(this);
     }
 
@@ -22,7 +23,12 @@ class Racer extends Robot {
     }
 
     public int getMaxBeepers() {
-        return maxBeepers;
+        return this.maxBeepers;
+    }
+
+    public int[] getDeliveryPosition()
+    {
+        return this.deliveryPosition;
     }
 
     public void run() {
