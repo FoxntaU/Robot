@@ -31,31 +31,27 @@ class Racer extends Robot {
     }
 
     public void race(Section[] sections) {
-        int latestStreet = sections[this.number].startStreet;
-        int latestAvenue = sections[this.number].startAvenue;
-        moveToLocation(sections[this.number].startStreet, sections[this.number].startAvenue);
+        int latestAvenue = sections[this.number].startStreet;
+        int latestStreet = sections[this.number].startAvenue;
 
         while (anyBeepersInWorld()) {
             // Section{startAvenue=3, endAvenue=10, startStreet=1, endStreet=8}
-            if (nextToABeeper()) {
-                pickBeeper();
-                beepersInTheBag++;        
-            }
-            else {
-                move();
-            }
-            if (beepersInTheBag == maxBeepers) {
-                deliverBeepers();
-                moveToLocation(latestStreet, latestAvenue);
-                beepersInTheBag = 0;
-            }
+            System.out.println(sections[this.number]);
+            moveToLocation(sections[this.number].startStreet, sections[this.number].startAvenue);
+            pickBeeper();
+            returnToStart();
+            putBeeper();
+            moveToLocation(sections[this.number].startStreet, sections[this.number].startAvenue);
+            // int[] currentPosition = getCurrentPosition();
+            // System.out.println("Current position: (" + currentPosition[0] + ", " + currentPosition[1] + ")");
+            // returnToStart();
         }
     }
 
-
-
     public void pickBeepersUntilBagIsFull() {
-        
+        while (nextToABeeper() && beepersInTheBag <= maxBeepers) {
+            pickBeeper();
+            beepersInTheBag++;        }
     }
 
     public void deliverBeepers() {
@@ -72,7 +68,7 @@ class Racer extends Robot {
         moveToLocation(startStreet, startAvenue);
         System.out.println("Returned to start at (" + startStreet + ", " + startAvenue + ")");
     }
-
+    
 
     private boolean outOfBoundaries() {
         return currentStreet < 1 || currentStreet > 8 || currentAvenue < 1 || currentAvenue > 10;

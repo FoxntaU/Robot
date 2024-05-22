@@ -1,4 +1,4 @@
-java -cp ".;KarelJRobot.jar" MiPrimerRobot -r 4 
+java -cp ".;KarelJRobot.jar" MiPrimerRobot -r 4
 pause
 exit
 
