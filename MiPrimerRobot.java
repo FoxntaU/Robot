@@ -1,7 +1,9 @@
 import kareltherobot.*;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class Racer extends Robot {
     private int number;
@@ -34,6 +36,7 @@ class Racer extends Robot {
         int latestAvenue = sections[this.number].startAvenue;
         moveToLocation(sections[this.number].startStreet, sections[this.number].startAvenue);
         boolean finished = false;
+        Section mySection = sections[this.number];
 
         while (true) {
             // Section{startAvenue=3, endAvenue=10, startStreet=1, endStreet=8}
@@ -41,6 +44,7 @@ class Racer extends Robot {
                 pickBeeper();
                 beepersInTheBag++;        
             }
+            //Regresar posicion inicial 
             else if (finished){
                 if (beepersInTheBag != 0) {
                     deliverBeepers();
@@ -48,9 +52,11 @@ class Racer extends Robot {
                 returnToStart();
                 break;
             }
+
             else if (this.currentAvenue == 10 && !nextToABeeper()){
                 System.out.println("acabe la fila");
                 latestStreet = latestStreet + 1;
+                mySection.latestStreetVisited = latestStreet;
                 moveToLocation(latestStreet, latestAvenue);
                 if (beepersInTheBag != maxBeepers) {
                     turnTo("EAST");                    
@@ -61,8 +67,19 @@ class Racer extends Robot {
                 move();
             }
 
-            if (this.currentAvenue == sections[this.number].endAvenue && this.currentStreet == sections[this.number].endStreet && !nextToABeeper() ){
-                finished = true;
+            //DICE QUE SE ACABO LA SECCION
+            if ((this.currentAvenue == mySection.endAvenue && this.currentStreet == mySection.endStreet && !nextToABeeper()) || mySection.isFinished){
+
+                mySection.isFinished = true;
+                List<Section> unfinishedSection = UnfinishedSectionsFilter(sections);
+                deliverBeepers();
+                if (unfinishedSection.isEmpty()){
+                    finished = true;
+                }
+                else{
+                    mySection = unfinishedSection.get(0);
+                    latestStreet = mySection.latestStreetVisited;
+                }
             }
 
             if (beepersInTheBag == maxBeepers) {
@@ -78,6 +95,10 @@ class Racer extends Robot {
     }
 
 
+    public static  List<Section> UnfinishedSectionsFilter(Section[] sections)
+    {
+        return Arrays.stream(sections).filter(section -> !section.isFinished).collect(Collectors.toList());
+    }
 
     public void pickBeepersUntilBagIsFull() {
         
@@ -346,12 +367,16 @@ class Section {
     public int endAvenue;
     public int startStreet;
     public int endStreet;
+    public boolean isFinished;
+    public int latestStreetVisited;
 
     public Section(int startAvenue, int endAvenue, int startStreet, int endStreet) {
         this.startAvenue = startAvenue;
         this.endAvenue = endAvenue;
         this.startStreet = startStreet;
         this.endStreet = endStreet;
+        this.latestStreetVisited = startStreet;
+        this.isFinished = false;
     }
 
     public boolean beepersExist() {
@@ -365,6 +390,7 @@ class Section {
                 ", endAvenue=" + endAvenue +
                 ", startStreet=" + startStreet +
                 ", endStreet=" + endStreet +
+                ", latestStreetVisited="+ latestStreetVisited+
                 '}';
     }
 }
