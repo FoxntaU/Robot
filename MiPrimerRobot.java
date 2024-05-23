@@ -13,7 +13,6 @@ class Racer extends Robot {
     private int startStreet;
     private int startAvenue;
     private int beepersInTheBag;
-    private static List<int[]> beeperLocations = new ArrayList<>();
 
     public Racer(int street, int avenue, Direction direction, int beepers, Color color, int maxBeepers, String id,
             int number) {
@@ -34,22 +33,45 @@ class Racer extends Robot {
         int latestStreet = sections[this.number].startStreet;
         int latestAvenue = sections[this.number].startAvenue;
         moveToLocation(sections[this.number].startStreet, sections[this.number].startAvenue);
+        boolean finished = false;
 
-        while (anyBeepersInWorld()) {
+        while (true) {
             // Section{startAvenue=3, endAvenue=10, startStreet=1, endStreet=8}
             if (nextToABeeper()) {
                 pickBeeper();
                 beepersInTheBag++;        
             }
-            else {
+            else if (finished){ 
+                returnToStart();
+                break;
+            }
+            else if (this.currentAvenue == 10 && !nextToABeeper()){
+                System.out.println("acabe la fila");
+                latestStreet = latestStreet + 1;
+                moveToLocation(latestStreet, latestAvenue);
+                if (beepersInTheBag != maxBeepers) {
+                    turnTo("EAST");                    
+                }
+            }
+
+            else{
                 move();
             }
+
+            if (this.currentAvenue == sections[this.number].endAvenue && this.currentStreet == sections[this.number].endStreet && !nextToABeeper() ){
+                finished = true;
+            }
+
             if (beepersInTheBag == maxBeepers) {
                 deliverBeepers();
                 moveToLocation(latestStreet, latestAvenue);
                 beepersInTheBag = 0;
             }
+
         }
+
+        turnOff();
+
     }
 
 
@@ -141,26 +163,6 @@ class Racer extends Robot {
                 return facingWest();
             default:
                 return false;
-        }
-    }
-
-    private boolean anyBeepersInWorld() {
-        synchronized (beeperLocations) {
-            return !beeperLocations.isEmpty();
-        }
-    }
-
-    private void updateBeeperLocations(int street, int avenue) {
-        synchronized (beeperLocations) {
-            int[] currentLocation = { street, avenue };
-            beeperLocations.removeIf(location -> location[0] == street && location[1] == avenue && !nextToABeeper());
-        }
-    }
-
-    public static void addBeeperLocation(int street, int avenue) {
-        synchronized (beeperLocations) {
-            int[] location = { street, avenue };
-            beeperLocations.add(location);
         }
     }
 
@@ -291,6 +293,16 @@ class RobotFactory implements Directions {
 }
 
 class BeepersFactory {
+    private static List<int[]> beeperLocations = new ArrayList<>();
+
+
+    public static void addBeeperLocation(int street, int avenue) {
+        synchronized (beeperLocations) {
+            int[] location = { street, avenue };
+            beeperLocations.add(location);
+        }
+    }
+
     public static void generateBeepersRandomly(String[] args) {
         int min_avenue = 3;
         int min_street = 1;
@@ -314,12 +326,14 @@ class BeepersFactory {
             }
         }
 
+
+
         int num_beepers = r * 100; // Usar args para encontrar la cantidad de beepers
         for (int j = 0; j < num_beepers; j++) {
             int street = (int) (Math.random() * range_street + min_street);
             int avenue = (int) (Math.random() * range_avenue + min_avenue);
             World.placeBeepers(street, avenue, 1);
-            Racer.addBeeperLocation(street, avenue);
+            addBeeperLocation(street, avenue);
         }
     }
 }
@@ -374,6 +388,7 @@ public class MiPrimerRobot {
     public static void main(String[] args) {
         BeepersFactory.generateBeepersRandomly(args);
         World.readWorld("Mundo.kwld");
+        World.showSpeedControl(true);
         World.setVisible(true);
 
         Racer[] racers = RobotFactory.createRobots(args);
