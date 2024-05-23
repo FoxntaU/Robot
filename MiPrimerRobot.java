@@ -41,7 +41,10 @@ class Racer extends Robot {
                 pickBeeper();
                 beepersInTheBag++;        
             }
-            else if (finished){ 
+            else if (finished){
+                if (beepersInTheBag != 0) {
+                    deliverBeepers();
+                }
                 returnToStart();
                 break;
             }
