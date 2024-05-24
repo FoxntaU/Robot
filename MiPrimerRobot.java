@@ -94,7 +94,10 @@ class Racer extends Robot {
 
     }
 
-
+    public synchronized void pickBeeper() {
+        super.pickBeeper();
+    }
+    
     public static  List<Section> UnfinishedSectionsFilter(Section[] sections)
     {
         return Arrays.stream(sections).filter(section -> !section.isFinished).collect(Collectors.toList());
